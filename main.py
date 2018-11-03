@@ -41,6 +41,9 @@ class Config:
         self.results_dir = os.path.normpath(cparser['DIR']['results_dir'])
         self.csv_title = cparser['DIR']['csv_title']
 
+        # load and save algorithm parameters
+        self.k = cparser.getint('PARAMS', 'k_kmeans')
+
         if (not (os.path.exists(self.data_dir) and
                  os.path.isfile(self.truth_csv) and
                  os.path.exists(self.results_dir))):

@@ -11,13 +11,14 @@ dominant colors.
 import cv2
 import numpy as np
 
-def kmeans(img):
+def kmeans(img, K):
     """
     Applies kmeans clustering to a single img and returns the kmeans img and
     a list of the data gathered by the kmeans calculation.
 
     Args:
       img: np.array representing the img, as read from imread()
+      K: no shit
 
     Output:
       clusters: list of tuples of the 5 clusters found by kmeans. Each entry
@@ -43,7 +44,6 @@ def kmeans(img):
     epsilon = 1.0
     attempts = 2
     flags = cv2.KMEANS_PP_CENTERS
-    K = 5
 
     criteria = (cv2.TERM_CRITERIA_MAX_ITER, max_iterations, epsilon)
     ret,label,centers = cv2.kmeans(Z,K,None,criteria,attempts,flags)
@@ -77,6 +77,7 @@ def kmeans(img):
     return clusters
 
 def kmeans_stats(clusters):
+    # this is from Seeker; has some ideas we may want to use
     """
     Given a list of tuples of clusters (obtained from kmeans()),
     provides relevant statistics about the clustering.
@@ -116,6 +117,9 @@ def kmeans_stats(clusters):
     cluster2_color = np.array(clusters[1][1], dtype=np.int32)
     cluster2_num_px = clusters[1][0]
 
+    cluster3_color = np.array(clusters[2][1], dtype=np.int32)
+    cluster3_num_px = clusters[2][0]
+
     cluster4_color = np.array(clusters[3][1], dtype=np.int32)
     cluster4_num_px = clusters[3][0]
 
@@ -130,9 +134,11 @@ def kmeans_stats(clusters):
     ratio_last2_clusters = cluster4_num_px / cluster5_num_px
 
     # get number of pixels for each
-    dominant_bgr_color2_num_px = cluster2_num_px
     dominant_bgr_color1_num_px = cluster1_num_px
+    dominant_bgr_color2_num_px = cluster2_num_px
+    dominant_bgr_color3_num_px = cluster3_num_px
     dominant_bgr_color4_num_px = cluster4_num_px
+    dominant_bgr_color5_num_px = cluster5_num_px
 
     # get the ratio of the num of pixels in top 2 dominant clusters to the last 2
     ratio_top2_to_last2_clusters = (cluster1_num_px + cluster2_num_px) / (cluster4_num_px + cluster5_num_px)

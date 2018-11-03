@@ -12,6 +12,7 @@ import os
 import cv2
 from attr.basic_attr import median_gray, median_hsv
 from attr.entropy import get_entropy
+from attr.kmeans import kmeans
 from attr.constants import FrameColumns, TruthColumns
 from utilities.file_handling import recursive_get_imgs_from_dir
 
@@ -24,6 +25,8 @@ class AttributeExtractor:
         self.csv_title = config.csv_title
         self.colsdict = config.colsdict
         self.process = config.process 
+        # save parameter configs
+        self.k = config.k
         # build dataframe
         self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process)
         
@@ -82,7 +85,7 @@ class AttributeExtractor:
         if self.colsdict['entropy']:
             self.frame.loc[imgindex, FrameColumns.entropy[0]] = get_entropy(img)
         if self.colsdict['kmeans']:
-            # km = XXX
+            # km = kmeans(img)
             # for value, i in enumerate(FrameColumns.kmeans):
             #     self.frame.loc[imgindex, value] = hsv[i]
             pass
