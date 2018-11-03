@@ -11,6 +11,8 @@ in a csv.
 
 import argparse
 import configparser
+import os
+from ast import literal_eval
 from attr.attr_extr import AttributeExtractor
 
 class Config:
@@ -18,32 +20,53 @@ class Config:
         # load args from cmd line
         parser = argparse.ArgumentParser()
         parser.add_argument('-c', type=str, help='supply path/to/CONFIG.ini')
-
-        self.args = vars(parser.parse_args())
-        config_file = self.args['c']
+        args = vars(parser.parse_args())
+        config_file = args['c']
         if config_file is None:
             parser.error('No config file specified.')
 
-        # save configs to self
-        parser = configparser.ConfigParser()
-        parser.read(config_file)
-        self.data_dir = parser['DIR']['data_dir']
-        self.results_dir = parser['DIR']['results_dir']
-        # TODO: add more here
+        # load config file in a parser
+        cparser = configparser.ConfigParser()
+        cparser.read(config_file)
+
+        # build columns according to config
+        self.colsdict = self.init_columns_dict(cparser)
+
+        # how many images to process
+        self.process = cparser.getint('RUN', 'process')
+
+        # load and save dir configs to self
+        self.data_dir = os.path.normpath(cparser['DIR']['data_dir'])
+        self.truth_csv = os.path.normpath(cparser['DIR']['truth_csv'])
+        self.results_dir = os.path.normpath(cparser['DIR']['results_dir'])
+        self.csv_title = cparser['DIR']['csv_title']
+
+        if (not (os.path.exists(self.data_dir) and
+                 os.path.isfile(self.truth_csv) and
+                 os.path.exists(self.results_dir))):
+            raise configparser.ParsingError('One or more DIR configs do not exist.')
+
+    def init_columns_dict(self, cparser):
+        # which data points to include
+        colsdict = cparser._sections['COLUMNS']
+        true, false = ('true', '1', 'yes'), ('false', '0', 'no')
+        for k, v in colsdict.items():
+            if v.lower() in true:
+                colsdict[k] = True
+            elif v.lower() in false:
+                colsdict[k] = False
+            else:
+                raise configparser.ParsingError('Invalid boolean in config')
+        return colsdict
 
 def main():
     # load configuration
     config = Config()
 
-    # create extractor and extract data from imgs
-    extr = AttributeExtractor(config.data_dir, config.results_dir)
+    # create extractor, extract, and save data from imgs
+    extr = AttributeExtractor(config)
     extr.extract()
-
-    # save data
     extr.save()
-
-    # done
-    print('Results saved to', config.results_dir, '\n')
 
 if __name__ == '__main__':
     main()

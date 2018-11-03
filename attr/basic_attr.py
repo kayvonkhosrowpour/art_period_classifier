@@ -11,7 +11,11 @@ different color spaces.
 import cv2
 import numpy as np
 
-def hue_value_stats(bgr_img):
+def median_gray(bgr_img):
+    gray_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
+    return np.median(gray_img)
+
+def median_hsv(bgr_img):
     """
     Given an opencv bgr image, returns the hue_median and value_median
     of the HSV representation of the image.
@@ -30,4 +34,4 @@ def hue_value_stats(bgr_img):
     sat_med = np.median(hsv_img[:,:,1]) # median of saturation channel
     value_med = np.median(hsv_img[:,:,0]) # median of value (i.e. brightness) channel
 
-    return hue_med, sat_med, value_med
+    return [hue_med, sat_med, value_med]
