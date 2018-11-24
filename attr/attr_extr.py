@@ -94,17 +94,30 @@ class AttributeExtractor:
         # save correct labels
         frame = frame.merge(truth, on=[FrameColumns.info[0]], how='left')
         frame.dropna(subset=TruthColumns.dropna_columns, inplace=True)
-        frame.sort_values(by=[FrameColumns.info[0]], kind='mergesort', inplace=True)
 
-        # TODO: REMOVE IMAGES FROM STYLES WE'RE NOT CONSIDERING
+        total = len(filenames)
+        if total != frame.index.size and process == -1:
+            print('WARNING: %d images will not be analyzed because of '
+                'missing style label.' % (total - frame.index.size))
+            total = frame.index.size
+
+        # remove images from styles we're not considering
+        style = TruthColumns.dropna_columns[0]
+        frame = frame[frame[style].isin(TruthColumns.keep_styles)]
+
+        if total != frame.index.size and process == -1:
+            print('NOTICE: ignoring %d of %d images not in TruthColumns.keep_styles' \
+                % (total - frame.index.size, total))
+
+        # sort by file name
+        frame.sort_values(by=[FrameColumns.info[0]], kind='mergesort', inplace=True)
 
         frame.set_index(FrameColumns.info[0], inplace=True)
         if process > 0:
             frame = frame.head(process)
 
-        if len(filenames) != frame.index.size and process == -1:
-            print('WARNING: %d images will not be analyzed because of '
-                'missing style label.' % (len(filenames) - frame.index.size))
+        if total != len(filenames):
+            print() # style, hoe
 
         return frame
 

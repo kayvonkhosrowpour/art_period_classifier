@@ -7,6 +7,9 @@ Description:
 Main driver of the attribute extractor script. Loads a config from provided arg
 and according to the config, extracts attributes and stores them for each img
 in a csv.
+
+Example usage:
+    python3 main.py -c configs/default_config.ini 
 """
 
 import argparse

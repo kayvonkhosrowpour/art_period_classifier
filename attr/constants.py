@@ -29,7 +29,6 @@ class TruthColumns:
 		'Medieval',
 		'Renaissance',
 		'Baroque',
-		'Romanticism',
 		'Realism',
 		'Impressionism',
 		'Post-Impressionism',
