@@ -86,7 +86,7 @@ def kmeans_stats(clusters, dist_colors=np.array([BLACK])):
             For example, clusters[0] is a tuple of the format:
                     (num_pixels_with_this_color, color)
             Color is the bgr np.array representing the color of the cluster.
-        dist_colors: the numpy array of colors of which to calculate the distances of.
+        dist_colors: the numpy array of BGRcolors of which to calculate the distances of.
             For example suppose len(clusters) = 3. If `dist_colors` = [[0, 0, 0]], 
             then the return value `color_distances` is a numpy matrix, where
             color_distances[0] is the list of euclidean distances between black (i.e. [0, 0, 0])
