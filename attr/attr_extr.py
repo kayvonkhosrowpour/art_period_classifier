@@ -5,6 +5,9 @@ Date Created: 10/25/18
 
 Description:
 Contains an object AttributeExtractor for collecting image attributes.
+To use the object, pass a main.Config object. Then call extract() to
+extract image features. To output the image features to a csv file,
+call save().
 """
 
 import pandas as pd
@@ -17,7 +20,20 @@ from attr.constants import FrameColumns, TruthColumns, DISTANCE_COLORS
 from utilities.file_handling import recursive_get_imgs_from_dir
 
 class AttributeExtractor:
+    """
+    Given a configuration, acts as a storage object for retreiving truth data
+    and extracted image features.
+    """
+
     def __init__(self, config):
+        """
+        Initialize the object with the provided configuration. Also requires the setting
+        of the attr.constants.DISTANCE_COLORS numpy array.
+
+        Arguments:
+            config: the main.Config object used to control the script.
+        """
+
         # save configurations
         self.data_dir = config.data_dir
         self.truth_csv = config.truth_csv
@@ -32,6 +48,18 @@ class AttributeExtractor:
         self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process)
         
     def init_frame(self, colsdict, truth_csv, process):
+        """
+        Initializes the dataframe with the given configuration.
+
+        Arguments:
+            colsdict: the column dictionary from the config object.
+            truth_csv: the csv containing truth data for each image in the dataset.
+            process: the number of images to process
+        Returns:
+            frame: the initializes pandas frame containing the columns of data that
+                is desired. The columns are specified by constants.FrameColumns and
+                constants.TruthColumns. See constants.py for more info.
+        """
         paths, filenames = recursive_get_imgs_from_dir(self.data_dir)
       
         # build basic columns
@@ -81,6 +109,10 @@ class AttributeExtractor:
         return frame
 
     def extract(self):
+        """
+        Extracts image features from all the images within the initialized pandas frame.
+        """
+
         print('Extracting image attributes...')
         index = self.frame.index.tolist()
         paths = self.frame[FrameColumns.info[1]].tolist()
@@ -88,6 +120,15 @@ class AttributeExtractor:
             self.process_img(imgindex, imgpath)
 
     def process_img(self, imgindex, imgpath):
+        """
+        For an image with `imgindex` into the pandas frame, extracts all necessary
+        features for the image and updates the table.
+
+        Arguments:
+            imgindex: the index into the pandas frame for the given image.
+            imgpath: the path to the image. 
+        """
+
         # load image
         img = cv2.imread(imgpath)
 
@@ -106,6 +147,15 @@ class AttributeExtractor:
         # TODO: add more extraction methods
 
     def store_kmeans_entry(self, img, imgindex):
+        """
+        For a single image instance, stores only the kmeans data for the image into
+        the pandas table. This was moved from self.process_img because it's kinda long.
+
+        Arguments:
+            img: the bgr image from self.process_img.
+            imgindex: the imgindex from self.process_img.
+        """
+
         clusters,_ = kmeans(img, self.k)
         num_px,colors,dist_top_2_vectors,ratio_top2_clusters,ratio_last2_clusters,\
             color_distances = kmeans_stats(clusters, dist_colors=self.dist_colors)
@@ -126,6 +176,14 @@ class AttributeExtractor:
             self.frame.loc[imgindex, value] = color_distances[i]
 
     def save(self):
+        """
+        Saves the results after evaluating all images. Note: calling save() before calling
+        extract() will output an empty dataframe. This is useful for seeing the columns, but
+        not much else.
+
+        Outputs:
+            a csv in self.results_dir with a title self.csv_title.
+        """
         print('Saving results...')
         if not os.path.exists(self.results_dir):
             os.makedirs(self.results_dir)
