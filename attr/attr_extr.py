@@ -44,6 +44,8 @@ class AttributeExtractor:
         # save parameter configs
         self.k = config.k
         self.dist_colors = DISTANCE_COLORS
+        # save misc
+        self.keep_clusters = config.keep_clusters
         # build dataframe
         self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process)
         
@@ -71,9 +73,10 @@ class AttributeExtractor:
 
         # build parameter-specific columns for kmeans
         FrameColumns.num_px = ['num_px(cluster_%d)' % k for k in range(0, self.k)]
-        FrameColumns.color = ['color(cluster_%d)' % k for k in range(0, self.k)]
         frame_cols += FrameColumns.num_px
-        frame_cols += FrameColumns.color
+        if self.keep_clusters:
+            FrameColumns.color = ['color(cluster_%d)' % k for k in range(0, self.k)]
+            frame_cols += FrameColumns.color
 
         dist_cluster_colors = []
         for k in range (0, self.k):
@@ -130,6 +133,7 @@ class AttributeExtractor:
         index = self.frame.index.tolist()
         paths = self.frame[FrameColumns.info[1]].tolist()
         for imgindex, imgpath in zip(index, paths):
+            print('Processing', imgindex)
             self.process_img(imgindex, imgpath)
 
     def process_img(self, imgindex, imgpath):
@@ -182,8 +186,9 @@ class AttributeExtractor:
         for i, value in enumerate(FrameColumns.num_px):
             self.frame.loc[imgindex, value] = num_px[i]
         # store the color for each cluster
-        for i, value in enumerate(FrameColumns.color):
-            self.frame.loc[imgindex, value] = colors[i]
+        if self.keep_clusters:
+            for i, value in enumerate(FrameColumns.color):
+                self.frame.loc[imgindex, value] = colors[i]
         # store the color distances
         for i, value in enumerate(FrameColumns.dist_cluster_colors):
             self.frame.loc[imgindex, value] = color_distances[i]

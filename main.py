@@ -47,6 +47,9 @@ class Config:
         # load and save algorithm parameters
         self.k = cparser.getint('PARAMS', 'k_kmeans')
 
+        # misc
+        self.keep_clusters = cparser.getboolean('MISC', 'keep_clusters')
+
         if (not (os.path.exists(self.data_dir) and
                  os.path.isfile(self.truth_csv) and
                  os.path.exists(self.results_dir))):
