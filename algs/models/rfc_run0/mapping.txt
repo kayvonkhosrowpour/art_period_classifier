@@ -1,0 +1,1 @@
+{0: 'Abstract Expressionism', 1: 'Art Nouveau (Modern)', 2: 'Baroque', 3: 'Expressionism', 4: 'Impressionism', 5: 'Post-Impressionism', 6: 'Realism'}

@@ -17,6 +17,7 @@ import configparser
 import pandas as pd
 import os
 import importlib.util
+import pprint
 
 class Config:
     def __init__(self, cparser):
@@ -31,7 +32,12 @@ class Config:
         self.save_dir = os.path.join(os.path.normpath(cparser.get('DIR', 'save_dir')),
             self.model_title)
         self.frame, self.mapping = self.get_data()
-        self.setup_files()
+
+    def __str__(self):
+        return pprint.pformat(vars(self), indent=4)
+
+    def __repr__(self):
+        return str(self)
 
     def get_data(self):
         """
@@ -82,9 +88,9 @@ class RFC_Config(Config):
         spec.loader.exec_module(module)
         self.param_grid = module.param_grid
         self.scoring = none_get(cparser,'GRIDSEARCHCVPARAMS', 'scoring')
-        self.n_jobs = none_get(cparser,'GRIDSEARCHCVPARAMS', 'n_jobs')
+        self.n_jobs = none_get(cparser,'GRIDSEARCHCVPARAMS', 'n_jobs', )
         self.pre_dispatch = none_get(cparser,'GRIDSEARCHCVPARAMS', 'pre_dispatch')
-        self.cv = none_get(cparser,'GRIDSEARCHCVPARAMS', 'cv')
+        self.cv = cparser.get_int('GRIDSEARCHCVPARAMS', 'cv', type=int)
 
     def init_hyperparams(self, cparser):
         """
@@ -93,16 +99,19 @@ class RFC_Config(Config):
         Arguments:
             cparser: the ConfigParser
         """
-        self.n_estimators = none_get(cparser, 'HYPERPARAMS', 'n_estimators')
+        self.n_estimators = none_get(cparser, 'HYPERPARAMS', 'n_estimators', type=int)
         self.criterion = none_get(cparser, 'HYPERPARAMS', 'criterion')
         self.max_depth = none_get(cparser, 'HYPERPARAMS', 'max_depth')
-        self.min_samples_split = none_get(cparser, 'HYPERPARAMS', 'min_samples_split')
-        self.min_samples_leaf = none_get(cparser, 'HYPERPARAMS', 'min_samples_leaf')
-        self.min_weight_fraction_leaf = none_get(cparser, 'HYPERPARAMS', 'min_weight_fraction_leaf')
+        self.min_samples_split = none_get(cparser, 'HYPERPARAMS', 'min_samples_split', 
+            type=int)
+        self.min_samples_leaf = none_get(cparser, 'HYPERPARAMS', 'min_samples_leaf', 
+            type=int)
+        self.min_weight_fraction_leaf = none_get(cparser, 'HYPERPARAMS', 
+            'min_weight_fraction_leaf', type=float)
         self.max_features = none_get(cparser, 'HYPERPARAMS', 'max_features')
         self.max_leaf_nodes = none_get(cparser, 'HYPERPARAMS', 'max_leaf_nodes')
         self.n_jobs = none_get(cparser, 'HYPERPARAMS', 'n_jobs')
-        self.verbose = none_get(cparser, 'HYPERPARAMS', 'verbose')
+        self.verbose = none_get(cparser, 'HYPERPARAMS', 'verbose', type=int)
 
 class ADA_Config(Config):
     def __init__(self, cparser):
@@ -112,8 +121,13 @@ class XGB_Config(Config):
     def __init__(self, cparser):
         super().__init__(cparser)
 
-def none_get(cparser, x, y):
-    z = cparser.get(x, y)
+def none_get(cparser, x, y, type=str):
+    if type is str:
+        z = cparser.get(x, y)
+    elif type is int:
+        z = cparser.getint(x, y)
+    elif type is float:
+        z = cparser.getfloat(x, y)
     return None if z == 'None' else z
 
 def parse():
@@ -142,4 +156,16 @@ def parse():
     else:
         cparser.ParsingError('Invalid model')
 
-    return config
+    print('========== Confirm model config ===========')
+    print(config)
+    print('===========================================')
+    resp = None
+    while not (resp == 'Y' or resp == 'N' or resp == 'DEBUG'):
+        resp = input('Confirm? (Y/N/DEBUG) ')
+    print()
+    if resp == 'Y':
+        config.setup_files()
+    elif resp == 'N':
+        config = None
+
+    return config, resp == 'Y'

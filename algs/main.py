@@ -20,10 +20,14 @@ from configs import parse
 from train import build_model
 
 def main():
-    config = parse()
+    config, save = parse()
+    if config is None:
+        print('Training terminated by user.')
+        exit(0)
     model = build_model(config)
     model.train()
-    model.save()
+    if save:
+        model.save()
 
 if __name__ == '__main__':
     main()

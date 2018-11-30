@@ -15,6 +15,7 @@ import os
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
+from time import sleep
 
 class Model:
     def __init__(self, config):
@@ -31,6 +32,10 @@ class Model:
 
 class RFC_Model(Model):
     def __init__(self, config):
+        """
+        Initialize the RFC_Model (RandomForestClassifier wrapper) with
+        the appropriate parameters according to the config.
+        """
         super().__init__(config)
         if config.cv_type == 'GridSearchCV':
             self.rfc = RandomForestClassifier()
@@ -55,10 +60,18 @@ class RFC_Model(Model):
                 n_jobs=config.n_jobs,
                 verbose=config.verbose
             )
-            self.clf = rfc
+            self.clf = self.rfc
 
     def train(self):
-        pass
+        """
+        Train on the config data according to the initialized classifier
+        `self.clf`. Assumes that all features should be included and that
+        the class column is 'style'.
+        """
+        print('Beginning training...'); sleep(1)
+        frame = self.config.frame
+        X, y = frame.drop('style', axis=1), frame['style']
+        self.clf.fit(X, y)
 
 class ADA_Model(Model):
     def __init__(self, config):
