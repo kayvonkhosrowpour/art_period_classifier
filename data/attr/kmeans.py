@@ -73,7 +73,7 @@ def kmeans(img, K, max_iterations=3, epsilon=1.0, attempts=2, flags=cv2.KMEANS_P
             clusters.append((log_of_num_px, color))
 
     # sort the clusters by dominance
-    clusters = sorted(clusters, reverse=True, key=lambda x: clusters[0])
+    clusters = sorted(clusters, reverse=True, key=lambda x: x[0])
 
     return clusters, kmeaned_img
 
