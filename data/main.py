@@ -9,7 +9,7 @@ and according to the config, extracts attributes and stores them for each img
 in a csv.
 
 Example usage:
-    python3 main.py -c configs/default_config.ini 
+    python3 main.py -c configs/basic_test.ini 
 """
 
 import argparse

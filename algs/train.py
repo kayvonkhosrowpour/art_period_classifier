@@ -15,12 +15,21 @@ import os
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
+from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score, recall_score
 from time import sleep
 
 class Model:
     def __init__(self, config):
         self.config = config
         self.clf = None
+
+    def test(self):
+        """
+        Tests the supplied data.
+        """
+        pass
+        
     def save(self):
         """
         Saves the model `self.clf` to the specified directory from `self.config`.
@@ -38,7 +47,7 @@ class RFC_Model(Model):
         """
         super().__init__(config)
         if config.cv_type == 'GridSearchCV':
-            self.rfc = RandomForestClassifier()
+            self.rfc = RandomForestClassifier(verbose=2)
             self.clf = GridSearchCV(
                 self.rfc,
                 config.param_grid,
@@ -58,7 +67,7 @@ class RFC_Model(Model):
                 max_features=config.max_features,
                 max_leaf_nodes=config.max_leaf_nodes,
                 n_jobs=config.n_jobs,
-                verbose=config.verbose
+                verbose=2
             )
             self.clf = self.rfc
 
@@ -68,9 +77,10 @@ class RFC_Model(Model):
         `self.clf`. Assumes that all features should be included and that
         the class column is 'style'.
         """
-        print('Beginning training...'); sleep(1)
         frame = self.config.frame
-        X, y = frame.drop('style', axis=1), frame['style']
+        frame = frame[frame['in_train']==True] # only consider training images
+        X, y = frame.drop(['style', 'in_train'], axis=1), frame['style']
+        print('Training on', len(X.index), 'images...'); sleep(1)
         self.clf.fit(X, y)
 
 class ADA_Model(Model):

@@ -92,8 +92,6 @@ class AttributeExtractor:
         # build truth dataframe
         print('Getting image truth data...')
         truth = pd.read_csv(truth_csv, index_col=TruthColumns.info[0])
-        truth = truth[truth[TruthColumns.drop_columns[0]]] # only training imgs
-        truth.drop(TruthColumns.drop_columns, axis='columns', inplace=True)
         
         # save correct labels
         frame = frame.merge(truth, on=[FrameColumns.info[0]], how='left')

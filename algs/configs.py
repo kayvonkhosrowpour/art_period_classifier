@@ -27,7 +27,8 @@ class Config:
             cparser: a configparser.ConfigParser object.
         """
         self.model = cparser.get('TYPE', 'model')
-        self.csv = cparser.get('DIR', 'data_csv')
+        self.train_data_csv = cparser.get('DIR', 'train_data_csv')
+        self.data_table = cparser.get('DIR', 'data_table')
         self.model_title = cparser.get('DIR', 'model_title')
         self.save_dir = os.path.join(os.path.normpath(cparser.get('DIR', 'save_dir')),
             self.model_title)
@@ -41,13 +42,13 @@ class Config:
 
     def get_data(self):
         """
-        If `self.csv` is initialized, loads the dataframe from the csv, converts
+        If `self.train_data_csv` is initialized, loads the dataframe from the csv, converts
         class names 'style' to integers.
         Returns:
             frame: the dataframe with classnames converted to integers.
             mapping: the classname to integer mappings in a dict.
         """
-        frame = pd.read_csv(self.csv)
+        frame = pd.read_csv(self.train_data_csv)
         frame.drop(['filename', 'path'], axis='columns', inplace=True)
         frame['style'] = pd.Categorical(frame['style'])
         mapping = dict(enumerate(frame['style'].cat.categories))
@@ -90,7 +91,7 @@ class RFC_Config(Config):
         self.scoring = none_get(cparser,'GRIDSEARCHCVPARAMS', 'scoring')
         self.n_jobs = none_get(cparser,'GRIDSEARCHCVPARAMS', 'n_jobs', )
         self.pre_dispatch = none_get(cparser,'GRIDSEARCHCVPARAMS', 'pre_dispatch')
-        self.cv = cparser.get_int('GRIDSEARCHCVPARAMS', 'cv', type=int)
+        self.cv = none_get(cparser, 'GRIDSEARCHCVPARAMS', 'cv', type=int)
 
     def init_hyperparams(self, cparser):
         """
@@ -111,7 +112,6 @@ class RFC_Config(Config):
         self.max_features = none_get(cparser, 'HYPERPARAMS', 'max_features')
         self.max_leaf_nodes = none_get(cparser, 'HYPERPARAMS', 'max_leaf_nodes')
         self.n_jobs = none_get(cparser, 'HYPERPARAMS', 'n_jobs')
-        self.verbose = none_get(cparser, 'HYPERPARAMS', 'verbose', type=int)
 
 class ADA_Config(Config):
     def __init__(self, cparser):
