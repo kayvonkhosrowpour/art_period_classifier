@@ -37,4 +37,4 @@ class TruthColumns:
 		'Abstract Expressionism',
 		'Contemporary'
 	]
-	drop_columns = ['artist', 'title', 'genre', 'date']
+	drop_columns = ['in_train']

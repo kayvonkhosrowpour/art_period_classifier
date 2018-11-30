@@ -53,6 +53,9 @@ class Config:
         if (not (os.path.exists(self.data_dir) and
                  os.path.isfile(self.truth_csv) and
                  os.path.exists(self.results_dir))):
+            print(self.data_dir)
+            print(self.truth_csv)
+            print(self.results_dir)
             raise configparser.ParsingError('One or more DIR configs do not exist.')
 
     def init_columns_dict(self, cparser):
