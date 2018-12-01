@@ -28,6 +28,7 @@ def main():
     model.train()
     if save:
         model.save()
+    model.test(save)
 
 if __name__ == '__main__':
     main()

@@ -33,6 +33,7 @@ class Config:
         self.save_dir = os.path.join(os.path.normpath(cparser.get('DIR', 'save_dir')),
             self.model_title)
         self.frame, self.mapping = self.get_data()
+        self.inv_mapping = {v:k for k, v in self.mapping.items()}
 
     def __str__(self):
         return pprint.pformat(vars(self), indent=4)
