@@ -96,7 +96,6 @@ def high_pass_filter(img, th1):
 
 def band_pass_filter(img, th1, th2):
         width, height = img.shape
-        print(width,height)
         fft = (np.fft.fftshift(np.fft.fft2(img)))
         h_Filter_High_Pass = np.zeros(img.size, img.dtype).reshape(img.shape)
         for i in range(0, width):

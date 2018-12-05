@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import os
 import cv2
+import time
 from attr.basic_attr import median_gray, median_hsv
 from attr.entropy import get_entropy
 from attr.kmeans import kmeans, kmeans_stats
@@ -43,6 +44,7 @@ class AttributeExtractor:
         self.csv_title = config.csv_title
         self.colsdict = config.colsdict
         self.process = config.process
+        self.who = config.who
         # save parameter configs
         self.k = config.k
         self.canny_1 = config.canny_1
@@ -58,18 +60,13 @@ class AttributeExtractor:
         self.bpf_3_2 = config.bpf_3_2
         self.hpf= config.hpf
 
-
-
-
-
-
         self.dist_colors = DISTANCE_COLORS
         # save misc
         self.keep_clusters = config.keep_clusters
         # build dataframe
-        self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process)
+        self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process, self.who)
 
-    def init_frame(self, colsdict, truth_csv, process):
+    def init_frame(self, colsdict, truth_csv, process, who):
         """
         Initializes the dataframe with the given configuration.
 
@@ -116,6 +113,7 @@ class AttributeExtractor:
         # save correct labels
         frame = frame.merge(truth, on=[FrameColumns.info[0]], how='left')
         frame.dropna(subset=TruthColumns.dropna_columns, inplace=True)
+        frame = frame[frame['who']==self.who]
 
         total = len(filenames)
         if total != frame.index.size and process == -1:
@@ -164,12 +162,11 @@ class AttributeExtractor:
             imgindex: the index into the pandas frame for the given image.
             imgpath: the path to the image.
         """
+        t = time.time()
 
         # load image
         img = cv2.imread(imgpath)
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        print("processing another image...")
-
 
         # extract desired attributes
         if self.colsdict['median_gray']:
@@ -208,13 +205,7 @@ class AttributeExtractor:
             dev, kurtosis, skew = stat_features(img_fft)
             self.frame.loc[imgindex, FrameColumns.freq_stats[0]] = dev
 
-
-
-
-
-
-
-        # TODO: add more extraction methods
+        print('Time taken:', round(time.time()-t, 2), 'sec\n')
 
     def store_kmeans_entry(self, img, imgindex):
         """
