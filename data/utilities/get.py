@@ -58,13 +58,13 @@ ren_rename = [
 ]
 
 # source
-data_src = '/Users/kayvon/code/divp/proj/data/data_table/data_table_who.csv'
-train_src = '/Volumes/Hey/train/train'
-test_src = '/Volumes/Hey/test/test'
+data_src = 'C:\\Users\\allis\\Documents\\image_processing\\art_period_classifier\\data\\data_table\\data_table_who.csv'
+train_src = 'D:\\train\\train'
+test_src = 'D:\\test\\test'
 
 # destination
-train_dst = '/Users/kayvon/Downloads/train'
-test_dst = '/Users/kayvon/Downloads/test'
+train_dst = 'C:\\Users\\allis\\Documents\image_processing\\train_dst'
+test_dst = 'C:\\Users\\allis\\Documents\\image_processing\\test_dst'
 
 # load imgs from source
 train_paths, train_names = get_imgs_from_dir(train_src)
@@ -110,4 +110,3 @@ if resp == 'Y':
     for v_tp, v_tn in zip(valid_test_paths, valid_test_names):
         print('Copying\nsrc=%s\ndst=%s\n' % (v_tp, os.path.join(test_dst, v_tn)))
         copyfile(v_tp, os.path.join(test_dst, v_tn))
-

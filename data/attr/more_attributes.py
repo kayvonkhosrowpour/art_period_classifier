@@ -86,9 +86,9 @@ def high_pass_filter(img, th1):
     g = np.multiply(fft, h_Filter_Low_Pass)
     g_ifft = (np.fft.ifft2(np.fft.ifftshift(g)).real)
     sum = 0
-    for i in range(0, width):
-        for j in range(0, height):
-            sum = sum + g_ifft[i,j]**2
+    # for i in range(0, width):
+    #     for j in range(0, height):
+    #         sum = sum + g_ifft[i,j]**2
     energy = np.sqrt(sum)
     median = np.median(g_ifft)
     deviation = np.std(g_ifft)
@@ -112,9 +112,9 @@ def band_pass_filter(img, th1, th2):
         g2 = g * h_Filter_Low_Pass
         g_ifft = (np.fft.ifft2(np.fft.ifftshift(g2)).real)
         sum = 0
-        for i in range(0, width):
-            for j in range(0, height):
-                sum = sum + g_ifft[i,j]**2
+        # for i in range(0, width):
+        #     for j in range(0, height):
+        #         sum = sum + g_ifft[i,j]**2
         energy = np.sqrt(sum)
         median = np.median(g_ifft)
         deviation = np.std(g_ifft)
