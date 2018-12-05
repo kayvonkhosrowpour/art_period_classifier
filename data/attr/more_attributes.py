@@ -29,11 +29,7 @@ def average_edges(img, sigma):
     lower, upper = auto_canny(img, sigma)
     edges = cv2.Canny(img,lower,upper)
     x,y = img.shape
-    count = 0
-    for i in range(0,x):
-        for j in range(0,y):
-            if img[i,j] == 1:
-                count = count + 1
+    count = np.count_nonzero(img == 1)
     percentage = count / (x*y)
 
     return percentage

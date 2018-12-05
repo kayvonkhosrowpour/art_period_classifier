@@ -154,7 +154,10 @@ class AttributeExtractor:
         print('Extracting image attributes over', n, 'images...')
         for i, (imgindex, imgpath) in enumerate(zip(index, paths)):
             print('Processing', imgindex, 'image', i, 'of', n)
-            self.process_img(imgindex, imgpath)
+            try:
+                self.process_img(imgindex, imgpath)
+            except:
+                pass # skip this image
 
     def process_img(self, imgindex, imgpath):
         """
