@@ -40,12 +40,15 @@ def x_y_gradient(img):
     sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
     countx = 0
     county = 1
-    for i in range(0,x):
-        for j in range(0,y):
-            if sobelx[i,j] == 1:
-                countx = countx + 1
-            if sobely[i,j] == 1:
-                county = county + 1
+    # for i in range(0,x):
+    #     for j in range(0,y):
+    #         if sobelx[i,j] == 1:
+    #             countx = countx + 1
+    #         if sobely[i,j] == 1:
+    #             county = county + 1
+    countx = np.count_nonzero(sobelx == 1)
+    county = np.count_nonzero(sobely == 1)
+
     percentage = countx / (x*y)
     percentage2 = county / (x*y)
     return percentage, percentage2
