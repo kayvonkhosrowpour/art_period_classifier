@@ -103,7 +103,6 @@ class AttributeExtractor:
 
         # create frame and update with file data
         frame = pd.DataFrame(columns=frame_cols)
-        frame = frame[frame['who']==self.who]
         frame[FrameColumns.info[0]] = filenames
         frame[FrameColumns.info[1]] = paths
 
@@ -120,6 +119,9 @@ class AttributeExtractor:
             print('WARNING: %d images will not be analyzed because of '
                 'missing style label.' % (total - frame.index.size))
             total = frame.index.size
+
+        # who is it for?
+        frame = frame[frame['who']==self.who]
 
         # remove images from styles we're not considering
         style = TruthColumns.dropna_columns[0]
