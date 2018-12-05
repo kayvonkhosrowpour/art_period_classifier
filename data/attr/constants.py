@@ -14,6 +14,13 @@ class FrameColumns:
 	median_hsv = ['median_hue', 'median_sat', 'median_val']
 	entropy = ['entropy']
 	kmeans = ['dist_top_2_vectors', 'log_ratio_top2_clusters', 'log_ratio_last2_clusters']
+	average_edges = ['canny1', 'canny2', 'canny3', 'canny4']
+	x_y_gradient = ['x_gradient', 'y_gradient']
+	freq_bands = ['freqBand1E','freqBand1M', 'freqBand1S', 'freqBand2E','freqBand2M','freqBand2S',
+	             'freqBand3E', 'freqBand3M', 'freqBand3S','freqBand4E','freqBand4M', 'freqBand4S',
+				 'freqBand5E', 'freqBand5M', 'freqBand5S']
+	stats = ['standard_deviation']
+	freq_stats = ['freq_standard_deviation']
 	num_px = None	# set in attr_extr
 	color = None	# set in attr_extr
 	dist_cluster_colors = None	# set in attr_extr

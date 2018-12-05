@@ -9,7 +9,7 @@ and according to the config, extracts attributes and stores them for each img
 in a csv.
 
 Example usage:
-    python3 main.py -c configs/basic_test.ini 
+    python3 main.py -c configs/basic_test.ini
 """
 
 import argparse
@@ -46,6 +46,21 @@ class Config:
 
         # load and save algorithm parameters
         self.k = cparser.getint('PARAMS', 'k_kmeans')
+        self.canny_1 = cparser.getfloat('PARAMS', 'canny_1')
+        self.canny_2 = cparser.getfloat('PARAMS', 'canny_2')
+        self.canny_3 = cparser.getfloat('PARAMS', 'canny_3')
+        self.canny_4 = cparser.getfloat('PARAMS', 'canny_4')
+        self.lpf = cparser.getint('PARAMS', 'lpf')
+        self.bpf_1_1 = cparser.getint('PARAMS', 'bpf_1_1')
+        self.bpf_1_2 = cparser.getint('PARAMS', 'bpf_1_2')
+        self.bpf_1_2 = cparser.getint('PARAMS', 'bpf_1_2')
+        self.bpf_2_1 = cparser.getint('PARAMS', 'bpf_2_1')
+        self.bpf_2_2 = cparser.getint('PARAMS', 'bpf_2_2')
+        self.bpf_3_1 = cparser.getint('PARAMS', 'bpf_3_1')
+        self.bpf_3_2 = cparser.getint('PARAMS', 'bpf_3_2')
+        self.hpf = cparser.getint('PARAMS', 'hpf')
+
+
 
         # misc
         self.keep_clusters = cparser.getboolean('MISC', 'keep_clusters')

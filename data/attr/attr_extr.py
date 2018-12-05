@@ -11,12 +11,14 @@ call save().
 """
 
 import pandas as pd
+import numpy as np
 import os
 import cv2
 from attr.basic_attr import median_gray, median_hsv
 from attr.entropy import get_entropy
 from attr.kmeans import kmeans, kmeans_stats
 from attr.constants import FrameColumns, TruthColumns, DISTANCE_COLORS
+from attr.more_attributes import auto_canny, average_edges, x_y_gradient, low_pass_filter, high_pass_filter, band_pass_filter, stat_features
 from utilities.file_handling import recursive_get_imgs_from_dir
 
 class AttributeExtractor:
@@ -40,15 +42,33 @@ class AttributeExtractor:
         self.results_dir = config.results_dir
         self.csv_title = config.csv_title
         self.colsdict = config.colsdict
-        self.process = config.process 
+        self.process = config.process
         # save parameter configs
         self.k = config.k
+        self.canny_1 = config.canny_1
+        self.canny_2 = config.canny_2
+        self.canny_3 = config.canny_3
+        self.canny_4 = config.canny_4
+        self.lpf= config.lpf
+        self.bpf_1_1 = config.bpf_1_1
+        self.bpf_1_2 = config.bpf_1_2
+        self.bpf_2_1 = config.bpf_2_1
+        self.bpf_2_2 = config.bpf_2_2
+        self.bpf_3_1 = config.bpf_3_1
+        self.bpf_3_2 = config.bpf_3_2
+        self.hpf= config.hpf
+
+
+
+
+
+
         self.dist_colors = DISTANCE_COLORS
         # save misc
         self.keep_clusters = config.keep_clusters
         # build dataframe
         self.frame = self.init_frame(self.colsdict, self.truth_csv, self.process)
-        
+
     def init_frame(self, colsdict, truth_csv, process):
         """
         Initializes the dataframe with the given configuration.
@@ -63,7 +83,7 @@ class AttributeExtractor:
                 constants.TruthColumns. See constants.py for more info.
         """
         paths, filenames = recursive_get_imgs_from_dir(self.data_dir)
-      
+
         # build basic columns
         frame_cols = [] + FrameColumns.info
         for (entry, value) in colsdict.items():
@@ -88,11 +108,11 @@ class AttributeExtractor:
         frame = pd.DataFrame(columns=frame_cols)
         frame[FrameColumns.info[0]] = filenames
         frame[FrameColumns.info[1]] = paths
-        
+
         # build truth dataframe
         print('Getting image truth data...')
         truth = pd.read_csv(truth_csv, index_col=TruthColumns.info[0])
-        
+
         # save correct labels
         frame = frame.merge(truth, on=[FrameColumns.info[0]], how='left')
         frame.dropna(subset=TruthColumns.dropna_columns, inplace=True)
@@ -142,11 +162,14 @@ class AttributeExtractor:
 
         Arguments:
             imgindex: the index into the pandas frame for the given image.
-            imgpath: the path to the image. 
+            imgpath: the path to the image.
         """
 
         # load image
         img = cv2.imread(imgpath)
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        print("processing another image...")
+
 
         # extract desired attributes
         if self.colsdict['median_gray']:
@@ -159,6 +182,49 @@ class AttributeExtractor:
             self.frame.loc[imgindex, FrameColumns.entropy[0]] = get_entropy(img)
         if self.colsdict['kmeans']:
             self.store_kmeans_entry(img, imgindex)
+        if self.colsdict['average_edges']:
+            self.frame.loc[imgindex, FrameColumns.average_edges[0]] = average_edges(img_gray, self.canny_1)
+            self.frame.loc[imgindex, FrameColumns.average_edges[1]] = average_edges(img_gray, self.canny_2)
+            self.frame.loc[imgindex, FrameColumns.average_edges[2]] = average_edges(img_gray, self.canny_3)
+            self.frame.loc[imgindex, FrameColumns.average_edges[3]] = average_edges(img_gray, self.canny_4)
+        if self.colsdict['x_y_gradient']:
+            x, y = x_y_gradient(img_gray)
+            self.frame.loc[imgindex, FrameColumns.x_y_gradient[0]] = x
+            self.frame.loc[imgindex, FrameColumns.x_y_gradient[1]] = y
+        if self.colsdict['freq_bands']:
+            energy, median, deviation = low_pass_filter(img_gray, self.lpf)
+            self.frame.loc[imgindex, FrameColumns.freq_bands[0]] = energy
+            self.frame.loc[imgindex, FrameColumns.freq_bands[1]] = median
+            self.frame.loc[imgindex, FrameColumns.freq_bands[2]] = deviation
+            energy, median, deviation = band_pass_filter(img_gray, self.bpf_1_2, self.bpf_1_1)
+            self.frame.loc[imgindex, FrameColumns.freq_bands[3]] = energy
+            self.frame.loc[imgindex, FrameColumns.freq_bands[4]] = median
+            self.frame.loc[imgindex, FrameColumns.freq_bands[5]] = deviation
+            energy, median, deviation = band_pass_filter(img_gray, self.bpf_2_2, self.bpf_2_1)
+            self.frame.loc[imgindex, FrameColumns.freq_bands[6]] = energy
+            self.frame.loc[imgindex, FrameColumns.freq_bands[7]] = median
+            self.frame.loc[imgindex, FrameColumns.freq_bands[8]] = deviation
+            energy, median, deviation = band_pass_filter(img_gray, self.bpf_3_2, self.bpf_3_1)
+            self.frame.loc[imgindex, FrameColumns.freq_bands[9]] = energy
+            self.frame.loc[imgindex, FrameColumns.freq_bands[10]] = median
+            self.frame.loc[imgindex, FrameColumns.freq_bands[11]] = deviation
+            energy, median, deviation = high_pass_filter(img_gray, self.hpf)
+            self.frame.loc[imgindex, FrameColumns.freq_bands[12]] = energy
+            self.frame.loc[imgindex, FrameColumns.freq_bands[13]] = median
+            self.frame.loc[imgindex, FrameColumns.freq_bands[14]] = deviation
+        if self.colsdict['stats']:
+            dev, kurtosis, skew = stat_features(img_gray)
+            self.frame.loc[imgindex, FrameColumns.stats[0]] = dev
+        if self.colsdict['freq_stats']:
+            img_fft = abs(np.fft.fftshift(np.fft.fft2(img_gray)))
+            dev, kurtosis, skew = stat_features(img_fft)
+            self.frame.loc[imgindex, FrameColumns.freq_stats[0]] = dev
+
+
+
+
+
+
 
         # TODO: add more extraction methods
 
@@ -177,7 +243,7 @@ class AttributeExtractor:
             color_distances = kmeans_stats(clusters, dist_colors=self.dist_colors)
         dist_ratios = [dist_top_2_vectors,ratio_top2_clusters,ratio_last2_clusters]
         color_distances = color_distances.flatten()
-        
+
         # store the kmeans ratios and differences
         for i, value in enumerate(FrameColumns.kmeans):
             self.frame.loc[imgindex, value] = dist_ratios[i]
