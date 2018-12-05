@@ -38,6 +38,9 @@ class Config:
         # how many images to process
         self.process = cparser.getint('RUN', 'process')
 
+        # who for?
+        self.who = cparser.get('DIR', 'who')
+
         # load and save dir configs to self
         self.data_dir = os.path.normpath(cparser['DIR']['data_dir'])
         self.truth_csv = os.path.normpath(cparser['DIR']['truth_csv'])
@@ -59,8 +62,6 @@ class Config:
         self.bpf_3_1 = cparser.getint('PARAMS', 'bpf_3_1')
         self.bpf_3_2 = cparser.getint('PARAMS', 'bpf_3_2')
         self.hpf = cparser.getint('PARAMS', 'hpf')
-
-
 
         # misc
         self.keep_clusters = cparser.getboolean('MISC', 'keep_clusters')

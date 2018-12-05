@@ -103,6 +103,7 @@ class AttributeExtractor:
 
         # create frame and update with file data
         frame = pd.DataFrame(columns=frame_cols)
+        frame = frame[frame['who']==self.who]
         frame[FrameColumns.info[0]] = filenames
         frame[FrameColumns.info[1]] = paths
 
@@ -113,7 +114,6 @@ class AttributeExtractor:
         # save correct labels
         frame = frame.merge(truth, on=[FrameColumns.info[0]], how='left')
         frame.dropna(subset=TruthColumns.dropna_columns, inplace=True)
-        frame = frame[frame['who']==self.who]
 
         total = len(filenames)
         if total != frame.index.size and process == -1:
