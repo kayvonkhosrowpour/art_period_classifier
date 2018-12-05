@@ -148,11 +148,12 @@ class AttributeExtractor:
         Extracts image features from all the images within the initialized pandas frame.
         """
 
-        print('Extracting image attributes...')
         index = self.frame.index.tolist()
         paths = self.frame[FrameColumns.info[1]].tolist()
-        for imgindex, imgpath in zip(index, paths):
-            print('Processing', imgindex)
+        n = len(index)
+        print('Extracting image attributes over', n, 'images...')
+        for i, (imgindex, imgpath) in enumerate(zip(index, paths)):
+            print('Processing', imgindex, 'image', i, 'of', n)
             self.process_img(imgindex, imgpath)
 
     def process_img(self, imgindex, imgpath):
