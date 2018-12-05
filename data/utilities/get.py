@@ -58,14 +58,13 @@ ren_rename = [
 ]
 
 # source
-data_src = '/Volumes/Hey/all_data_info.csv'
+data_src = '/Users/kayvon/code/divp/proj/data/data_table/data_table_who.csv'
 train_src = '/Volumes/Hey/train/train'
 test_src = '/Volumes/Hey/test/test'
 
 # destination
-csv_dst = '/Users/kayvon/code/divp/proj/data/data_table/data_table.csv'
-train_dst = '/Users/kayvon/code/divp/proj/data/train'
-test_dst = '/Users/kayvon/code/divp/proj/data/test'
+train_dst = '/Users/kayvon/Downloads/train'
+test_dst = '/Users/kayvon/Downloads/test'
 
 # load imgs from source
 train_paths, train_names = get_imgs_from_dir(train_src)
@@ -73,30 +72,9 @@ test_paths, test_names = get_imgs_from_dir(test_src)
 
 # load data
 truth = pd.read_csv(data_src)
-truth.dropna(subset=['style'], inplace=True) # remove imgs w/o style
-
-# collect renaissance paintings
-truth.loc[truth['style'].isin(ren_rename), 'style'] = 'Renaissance'
-
-# collect medieval paintings
-truth.loc[truth['style'].isin(med_rename), 'style'] = 'Medieval'
-
-# keep images w/ desired style
-truth = truth[truth['style'].isin(keep_styles)]
-
-# keep only desired columns
-truth = truth[['style', 'in_train', 'new_filename']]
-truth.rename(columns={'new_filename':'filename'}, inplace=True)
 
 # set index to filename
 truth.set_index('filename', inplace=True)
-
-# show number in each class
-for i in range(0, len(keep_styles)):
-    print(truth[truth['style']==keep_styles[i]].size, keep_styles[i])
-
-# save csv to dst
-truth.to_csv(csv_dst)
 
 # get valid train imgs
 valid_train_paths, valid_train_names = \
@@ -105,6 +83,14 @@ valid_train_paths, valid_train_names = \
 # get valid test imgs
 valid_test_paths, valid_test_names = \
     get_valid(truth, test_names, test_paths, False)
+
+# drop unwanted imgs
+truth = truth[~(truth.index.isin(valid_train_names) | truth.index.isin(valid_train_names))]
+
+# show number in each class
+print('Total number of images:', truth.size)
+for i in range(0, len(keep_styles)):
+    print(truth[truth['style']==keep_styles[i]].size, keep_styles[i])
 
 # confirm
 from pprint import pprint
