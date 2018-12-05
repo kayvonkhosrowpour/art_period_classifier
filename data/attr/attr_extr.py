@@ -192,26 +192,14 @@ class AttributeExtractor:
             self.frame.loc[imgindex, FrameColumns.x_y_gradient[0]] = x
             self.frame.loc[imgindex, FrameColumns.x_y_gradient[1]] = y
         if self.colsdict['freq_bands']:
-            energy, median, deviation = low_pass_filter(img_gray, self.lpf)
+            energy, median, deviation = band_pass_filter(img_gray, self.bpf_2_2, self.bpf_2_1)
             self.frame.loc[imgindex, FrameColumns.freq_bands[0]] = energy
             self.frame.loc[imgindex, FrameColumns.freq_bands[1]] = median
             self.frame.loc[imgindex, FrameColumns.freq_bands[2]] = deviation
-            energy, median, deviation = band_pass_filter(img_gray, self.bpf_1_2, self.bpf_1_1)
+            energy, median, deviation = high_pass_filter(img_gray, self.hpf)
             self.frame.loc[imgindex, FrameColumns.freq_bands[3]] = energy
             self.frame.loc[imgindex, FrameColumns.freq_bands[4]] = median
             self.frame.loc[imgindex, FrameColumns.freq_bands[5]] = deviation
-            energy, median, deviation = band_pass_filter(img_gray, self.bpf_2_2, self.bpf_2_1)
-            self.frame.loc[imgindex, FrameColumns.freq_bands[6]] = energy
-            self.frame.loc[imgindex, FrameColumns.freq_bands[7]] = median
-            self.frame.loc[imgindex, FrameColumns.freq_bands[8]] = deviation
-            energy, median, deviation = band_pass_filter(img_gray, self.bpf_3_2, self.bpf_3_1)
-            self.frame.loc[imgindex, FrameColumns.freq_bands[9]] = energy
-            self.frame.loc[imgindex, FrameColumns.freq_bands[10]] = median
-            self.frame.loc[imgindex, FrameColumns.freq_bands[11]] = deviation
-            energy, median, deviation = high_pass_filter(img_gray, self.hpf)
-            self.frame.loc[imgindex, FrameColumns.freq_bands[12]] = energy
-            self.frame.loc[imgindex, FrameColumns.freq_bands[13]] = median
-            self.frame.loc[imgindex, FrameColumns.freq_bands[14]] = deviation
         if self.colsdict['stats']:
             dev, kurtosis, skew = stat_features(img_gray)
             self.frame.loc[imgindex, FrameColumns.stats[0]] = dev
